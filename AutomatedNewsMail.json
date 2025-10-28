@@ -1,0 +1,121 @@
+{
+  "name": "AutomatedNewsMail",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=0bd5585b4fd2462fade98bfcceed792c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "11828352-9399-4f61-9702-080ac30ddd6c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "katyayini.k@gmail.com",
+        "subject": "Hey.. Enjoy the news",
+        "message": "={{ $json[\"email_body\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "9ba381ce-8c34-4516-9238-37aa8030fe15",
+      "name": "Send a message",
+      "webhookId": "e98cea68-a898-41a0-8043-1bdf4a69f007",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "NyqXpIjGPBOVIiwW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const articles = $json.articles.slice(0, 3); // top 3 articles\nlet body = \"📰 *Top 3 Business News Today*\\n\\n\";\n\narticles.forEach((a, i) => {\n  body += `${i + 1}. ${a.title}\\nSource: ${a.source.name}\\nURL: ${a.url}\\n\\n`;\n});\n\nreturn [{ json: { email_body: body } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "dde479f7-6375-4a43-b8c0-6614abdd97e6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8171f6c3-2dfc-4f25-94d8-d25480b7eafe",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0600e394-e198-42f8-9628-7e41ae3fe4d4",
+  "meta": {
+    "instanceId": "3ba1bdbdb6b5b539ee165cc1cf15acad9433573457674d057c3e551204fa90ed"
+  },
+  "id": "LchNP9WCXMkxKSpV",
+  "tags": []
+}
